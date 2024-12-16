@@ -1,0 +1,59 @@
+﻿@model OnlineStore.Models.Category
+
+@{
+    ViewBag.Title = "Add New Category";
+    Layout = "~/Views/Shared/_Layout.cshtml"; 
+}
+
+<div class="container mt-5">
+    <h2 class="text-center text-white bg-primary p-3">Add New Category</h2>
+
+    <div class="card shadow p-4">
+        @using (Html.BeginForm("AddCategory", "Category", FormMethod.Post, new { @class = "form-horizontal" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.CategoryName, "Category Name", new { @class = "control-label" })
+                @Html.TextBoxFor(model => model.CategoryName, new { @class = "form-control", placeholder = "Enter Category Name" })
+                @Html.ValidationMessageFor(model => model.CategoryName, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group text-center mt-4">
+                <button type="submit" class="btn btn-success btn-lg">Save</button>
+                <button type="reset" class="btn btn-secondary btn-lg">Reset</button>
+            </div>
+        }
+        @Html.ActionLink("Back to Category Details", "DisplayCategories", null, new { @class = "btn btn-success mt-3 d-block mx-auto" })
+
+    </div>
+</div>
+
+<style>
+   
+    .container {
+        max-width: 600px;
+        margin: auto;
+    }
+
+    h2 {
+        border-radius: 5px;
+    }
+
+    .card {
+        border-radius: 10px;
+        background-color: #f9f9f9;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .btn {
+        width: 120px;
+    }
+
+    .text-danger {
+        font-size: 0.9rem;
+    }
+</style>

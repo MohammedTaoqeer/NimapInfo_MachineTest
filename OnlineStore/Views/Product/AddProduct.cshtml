@@ -1,0 +1,56 @@
+﻿@model OnlineStore.Models.Product
+
+@{
+    ViewBag.Title = "Add New Product";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center p-3" style="background-color: yellowgreen; color: orangered;">
+        Add New Product
+    </h2>
+
+    @using (Html.BeginForm("AddProduct", "Product", FormMethod.Post, new { enctype = "multipart/form-data", @class = "needs-validation", novalidate = "novalidate" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="ProductName" class="form-label">Product Name</label>
+                @Html.TextBoxFor(P => P.ProductName, new { @class = "form-control", placeholder = "Enter product name", required = "required" })
+                <div class="invalid-feedback">Product name is required.</div>
+            </div>
+
+
+            <div class="col-md-6 mb-3">
+                <label asp-for="UnitPrice" class="form-label">Unit Price</label>
+                @Html.TextBoxFor(P => P.UnitPrice, new { @class = "form-control", placeholder = "Enter unit price", required = "required" })
+                <div class="invalid-feedback">Unit price is required.</div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="selectedFile" class="form-label">Upload Product Image</label>
+                <input type="file" name="selectedFile" class="form-control" />
+                <div class="invalid-feedback">Product image is required.</div>
+            </div>
+
+
+            <div class="col-md-6 mb-3">
+                <label for="CategoryId" class="form-label">Category</label>
+                @Html.DropDownListFor(P => P.CategoryId, (SelectList)ViewBag.CategoryId, "Select Category", new { @class = "form-select", required = "required" })
+                <div class="invalid-feedback">Category is required.</div>
+            </div>
+        </div>
+
+
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-success me-3">Save</button>
+            <button type="reset" class="btn btn-secondary">Reset</button>
+        </div>
+    }
+
+    <div class="text-center mt-3">
+        @Html.ActionLink("Back to Product Details", "DisplayProducts", null, new { @class = "btn btn-primary" })
+    </div>
+</div>

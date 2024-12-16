@@ -1,0 +1,63 @@
+﻿@model OnlineStore.Models.Category
+
+@{
+    ViewBag.Title = "Update Category";
+    Layout = "~/Views/Shared/_Layout.cshtml"; 
+}
+
+<div class="container mt-5">
+    <h2 class="text-center text-white bg-warning p-3">Update Category</h2>
+
+    <div class="card shadow p-4">
+        @using (Html.BeginForm("UpdateCategory", "Category", FormMethod.Post, new { @class = "form-horizontal" }))
+         {
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.CategoryId, "Category ID", new { @class = "control-label" })
+                @Html.TextBoxFor(model => model.CategoryId, new { @class = "form-control", @readonly = "true" })
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.CategoryName, "Category Name", new { @class = "control-label" })
+                @Html.TextBoxFor(model => model.CategoryName, new { @class = "form-control", placeholder = "Enter Category Name" })
+                @Html.ValidationMessageFor(model => model.CategoryName, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group text-center mt-4">
+                <button type="submit" class="btn btn-primary btn-lg">Save</button>
+                @Html.ActionLink("Cancel", "DisplayCategories", null, new { @class = "btn btn-secondary btn-lg" })
+            </div>
+         }
+    </div>
+</div>
+
+<style>
+   
+    .container {
+        max-width: 600px;
+        margin: auto;
+    }
+
+    h2 {
+        border-radius: 5px;
+    }
+
+    .card {
+        border-radius: 10px;
+        background-color: #f9f9f9;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .btn {
+        width: 120px;
+    }
+
+    .text-danger {
+        font-size: 0.9rem;
+    }
+
+</style>

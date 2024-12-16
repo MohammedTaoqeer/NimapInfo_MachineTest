@@ -1,0 +1,59 @@
+﻿@model OnlineStore.Models.Product
+
+@{
+    ViewBag.Title = "Edit Product";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center p-3" style="background-color: yellowgreen; color: orangered;">
+        Update Product
+    </h2>
+
+    @using (Html.BeginForm("UpdateProduct", "Product", FormMethod.Post, new { enctype = "multipart/form-data", @class = "needs-validation", novalidate = "novalidate" }))
+     {
+        @Html.AntiForgeryToken()
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="ProductId" class="form-label">Product ID</label>
+                        @Html.TextBoxFor(p => p.ProductId, new { @class = "form-control", @readonly = "true" })
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="ProductName" class="form-label">Product Name</label>
+                        @Html.TextBoxFor(p => p.ProductName, new { @class = "form-control", placeholder = "Enter product name", required = "required" })
+                        <div class="invalid-feedback">Product name is required.</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="UnitPrice" class="form-label">Unit Price</label>
+                        @Html.TextBoxFor(p => p.UnitPrice, new { @class = "form-control", placeholder = "Enter unit price", required = "required" })
+                        <div class="invalid-feedback">Unit price is required.</div>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="ProductImage" class="form-label">Product Image</label>
+                        <div>
+                            <img src="@Url.Content("~/Uploads/" + Model.ProductImageName)" alt="Product Image" width="200" height="200" class="img-fluid img-thumbnail mb-2" />
+                        </div>
+                        <input type="file" name="selectedFile" class="form-control" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="CategoryId" class="form-label">Category</label>
+                        @Html.DropDownListFor(p => p.CategoryId, (SelectList)ViewBag.CategoryId, "Select Category", new { @class = "form-select", required = "required" })
+                        <div class="invalid-feedback">Category is required.</div>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-success me-3">Update</button>
+                    @Html.ActionLink("Cancel", "DisplayProducts", null, new { @class = "btn btn-secondary" })
+                </div>
+       }
+    
+</div>
