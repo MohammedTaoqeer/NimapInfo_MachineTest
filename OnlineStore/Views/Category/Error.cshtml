@@ -1,0 +1,17 @@
+﻿@model OnlineStore.Models.Category
+
+@{
+    ViewBag.Title = "Duplicate Category Error";
+}
+
+<h2>Duplicate Category</h2>
+
+<div class="alert alert-danger">
+    <strong>Error:</strong> A category with the name <strong>@Model.CategoryName</strong> already exists.
+</div>
+
+<p>Please use a different name for your category.</p>
+
+<div>
+    <a href="@Url.Action("AddCategory", "Category")" class="btn btn-primary">Go Back</a>
+</div>

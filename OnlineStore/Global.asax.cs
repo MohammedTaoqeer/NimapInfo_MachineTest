@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using OnlineStore.IRepository;
+using OnlineStore.Repository;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using Unity;
+using Unity.AspNet.Mvc;
 
 namespace OnlineStore
 {
@@ -16,6 +16,17 @@ namespace OnlineStore
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+
+            RegisterDependencies();
+        }
+
+        private void RegisterDependencies()
+        {
+            var container = new UnityContainer();
+
+            container.RegisterType<ICategoryRepository, CategoryRepository>();
+            container.RegisterType<IProductRepository, ProductRepository>();
+            DependencyResolver.SetResolver(new UnityDependencyResolver(container));
         }
     }
 }

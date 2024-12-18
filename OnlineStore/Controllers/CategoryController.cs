@@ -1,35 +1,48 @@
-﻿using OnlineStore.Models;
+﻿using OnlineStore.IRepository;
+using OnlineStore.Models;
 using System;
-using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Mvc;
 
 namespace OnlineStore.Controllers
 {
     public class CategoryController : Controller
     {
-        private readonly StoreDbContext _dbContext;
+        private readonly ICategoryRepository _repository;
 
-        
-        public CategoryController()
+
+        public CategoryController(ICategoryRepository repository)
         {
-            _dbContext = new StoreDbContext();
+            _repository = repository;
         }
 
         public async Task<ActionResult> DisplayCategories()
         {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+
             try
             {
-                var categories = await _dbContext.Categories.ToListAsync();
-                return View(categories);
+                var categories = await _repository.GetAllCategoriesAsync();
+
+                if (categories != null && categories.Any())
+                {
+                    return View(categories);
+                }
+                else
+                {
+                    ViewBag.ErrorMessage = "No categories found.";
+                    return View();
+                }
+
             }
             catch (Exception ex)
             {
                 ViewBag.ErrorMessage = "An error occurred while fetching categories.";
-                return View("Error");
+                return View("Eror");
             }
         }
 
@@ -49,8 +62,17 @@ namespace OnlineStore.Controllers
 
             try
             {
-                 _dbContext.Categories.Add(category);
-                 await _dbContext.SaveChangesAsync();
+                var isDuplicate = await _repository.GetCategoryByNameAsync(category.CategoryName);
+
+                if (isDuplicate != null)
+                {
+                    ModelState.AddModelError("", "Duplicate category not allowed");
+                    return View("Error", category);
+                }
+
+
+                await _repository.AddCategoryAsync(category);
+
                 return RedirectToAction("DisplayCategories");
             }
             catch (Exception ex)
@@ -62,15 +84,16 @@ namespace OnlineStore.Controllers
 
         public async Task<ActionResult> EditCategory(int categoryId)
         {
+
             try
             {
-                 Category category = await _dbContext.Categories.FindAsync(categoryId);
-                 if(category == null)
-                 {
+                Category category = await _repository.GetCategoryByIdAsync(categoryId);
+                if (category == null)
+                {
                     return HttpNotFound("Category Not found");
-                 }
+                }
 
-                 return View(category);
+                return View(category);
             }
             catch (Exception ex)
             {
@@ -90,9 +113,16 @@ namespace OnlineStore.Controllers
 
             try
             {
-                _dbContext.Entry(category).State = EntityState.Modified;
-                await _dbContext.SaveChangesAsync();
-                return RedirectToAction("DisplayCategories");
+                if (category.CategoryId >= 0)
+                {
+                    await _repository.UpdateCategoryAsync(category);
+                    return RedirectToAction("DisplayCategories");
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Invalid Category ID.");
+                    return View(category);
+                }
             }
             catch (Exception ex)
             {
@@ -105,14 +135,13 @@ namespace OnlineStore.Controllers
         {
             try
             {
-                var category = await _dbContext.Categories.FindAsync(categoryId);
+                var category = await _repository.GetCategoryByIdAsync(categoryId);
                 if (category == null)
                 {
                     return HttpNotFound("Category not found.");
                 }
 
-                _dbContext.Categories.Remove(category);
-                await _dbContext.SaveChangesAsync();
+                await _repository.DeleteCategoryAsync(categoryId);
                 return RedirectToAction("DisplayCategories");
             }
             catch (Exception ex)
