@@ -45,7 +45,8 @@
 
                     <div class="col-md-6">
                         <label for="CategoryId" class="form-label">Category</label>
-                        @Html.DropDownListFor(p => p.CategoryId, (SelectList)ViewBag.CategoryId, "Select Category", new { @class = "form-select", required = "required" })
+                        @Html.DropDownListFor(p => p.CategoryId, (SelectList)ViewBag.CategoryId, "Select Category",
+                            new { @class = "form-select", required = "required" })
                         <div class="invalid-feedback">Category is required.</div>
                     </div>
                 </div>

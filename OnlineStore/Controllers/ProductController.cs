@@ -1,7 +1,7 @@
 ﻿using OnlineStore.IRepository;
 using OnlineStore.Models;
+using OnlineStore.Services;
 using System;
-using System.IO;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -13,15 +13,22 @@ namespace OnlineStore.Controllers
     {
         private readonly IProductRepository _repository;
         private readonly ICategoryRepository _categoryRepository;
-
-        public ProductController(IProductRepository repository, ICategoryRepository categoryRepository)
+        private readonly IFileUploadService _fileUploadService;
+        public ProductController(IProductRepository repository,
+                                 ICategoryRepository categoryRepository,
+                                 IFileUploadService fileUploadService)
         {
             _repository = repository;
             _categoryRepository = categoryRepository;
+            _fileUploadService = fileUploadService;
         }
 
         public async Task<ActionResult> DisplayProducts(int page = 1, int pageSize = 10)
         {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
 
             try
             {
@@ -47,12 +54,23 @@ namespace OnlineStore.Controllers
 
         public async Task<ActionResult> DisplayProduct(int ProductId)
         {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
             try
             {
                 var product = await _repository.GetProductByIdAsync(ProductId);
 
-                return View(product);
+                if (product != null)
+                {
 
+                    return View(product);
+
+                }
+
+                ViewBag.ErrorMessage = "The  product was not found.";
+                return View("Error");
             }
             catch (Exception ex)
             {
@@ -80,16 +98,11 @@ namespace OnlineStore.Controllers
 
                 if (selectedFile != null)
                 {
-                    string DirectoryPath = Server.MapPath("~/Uploads/");
-
-                    if (!Directory.Exists(DirectoryPath))
+                    if (selectedFile != null)
                     {
-                        Directory.CreateDirectory(DirectoryPath);
+                        string productImageName = await _fileUploadService.SaveProductImageAsync(selectedFile);
+                        product.ProductImageName = productImageName;
                     }
-
-                    selectedFile.SaveAs(DirectoryPath + selectedFile.FileName);
-                    BinaryReader br = new BinaryReader(selectedFile.InputStream);
-                    product.ProductImage = br.ReadBytes(selectedFile.ContentLength);
                     product.ProductImageName = selectedFile.FileName;
 
                 }
@@ -116,6 +129,8 @@ namespace OnlineStore.Controllers
 
                 var categories = await _categoryRepository.GetAllCategoriesAsync();
                 ViewBag.CategoryId = new SelectList(categories, "CategoryId", "CategoryName", product.CategoryId);
+
+
                 return View(product);
 
             }
@@ -129,19 +144,29 @@ namespace OnlineStore.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> UpdateProduct(Product product, HttpPostedFileBase selectedFile)
         {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+
             try
             {
+
+                var categoryExists = await _categoryRepository.GetCategoryByIdAsync(product.CategoryId);
+                if (categoryExists == null)
+                {
+                    return View("CategoryError");
+                }
+
+
                 if (selectedFile != null)
                 {
-                    string DirectoryPath = Server.MapPath("~/Uploads/");
-                    if (!Directory.Exists(DirectoryPath))
+                    if (selectedFile != null)
                     {
-                        Directory.CreateDirectory(DirectoryPath);
+                        string productImageName = await _fileUploadService.SaveProductImageAsync(selectedFile);
+                        product.ProductImageName = productImageName;
                     }
-                    selectedFile.SaveAs(DirectoryPath + selectedFile.FileName);
-                    BinaryReader br = new BinaryReader(selectedFile.InputStream);
-                    product.ProductImage = br.ReadBytes(selectedFile.ContentLength);
-                    product.ProductImageName = selectedFile.FileName;
+
                 }
                 else if (TempData["ProductImage"] != null && TempData["ProductImageName"] != null)
                 {

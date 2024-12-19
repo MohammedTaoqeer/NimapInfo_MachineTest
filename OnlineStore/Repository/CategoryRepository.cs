@@ -29,7 +29,7 @@ namespace OnlineStore.Repository
         public async Task AddCategoryAsync(Category category)
         {
             bool categoryExists = await _storeDbContext.Categories
-                                 .AnyAsync(c => c.CategoryName == category.CategoryName);
+                                 .AnyAsync(c => c.CategoryName.ToLower() == category.CategoryName);
 
             if (categoryExists)
             {
